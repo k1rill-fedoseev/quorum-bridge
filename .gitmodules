@@ -1,0 +1,4 @@
+[submodule "contracts"]
+	path = contracts
+	url = https://github.com/poanetwork/tokenbridge-contracts
+	branch = quorum-support

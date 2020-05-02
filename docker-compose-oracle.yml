@@ -1,0 +1,123 @@
+version: '2.4'
+services:
+    rabbit:
+        cpus: 0.3
+        mem_limit: 500m
+        environment: ['RABBITMQ_NODENAME=node@rabbit']
+        hostname: rabbit
+        image: rabbitmq:3
+        networks:
+            - net_rabbit_bridge_request
+            - net_rabbit_bridge_collected
+            - net_rabbit_bridge_affirmation
+            - net_rabbit_bridge_senderhome
+            - net_rabbit_bridge_senderforeign
+        restart: unless-stopped
+        volumes: []
+    redis:
+        cpus: 0.1
+        mem_limit: 500m
+        command: [redis-server, --appendonly, 'yes']
+        hostname: redis
+        image: redis:4
+        networks:    
+            - net_db_bridge_request
+            - net_db_bridge_collected
+            - net_db_bridge_affirmation
+            - net_db_bridge_senderhome
+            - net_db_bridge_senderforeign
+        restart: unless-stopped
+        volumes: []
+    bridge_request:
+        cpus: 0.1
+        mem_limit: 500m
+        image: poanetwork/tokenbridge-oracle:latest
+        env_file: ./.env.oracle
+        environment: 
+            - NODE_ENV=production
+        restart: unless-stopped
+        entrypoint: yarn watcher:signature-request
+        networks:
+            - net_db_bridge_request
+            - net_rabbit_bridge_request
+            - quorum-external-net
+            - ganache-external-net
+    bridge_collected:
+        cpus: 0.1
+        mem_limit: 500m
+        image: poanetwork/tokenbridge-oracle:latest
+        env_file: ./.env.oracle
+        environment: 
+            - NODE_ENV=production
+        restart: unless-stopped
+        entrypoint: yarn watcher:collected-signatures
+        networks:
+            - net_db_bridge_collected
+            - net_rabbit_bridge_collected
+            - quorum-external-net
+            - ganache-external-net
+    bridge_affirmation:
+        cpus: 0.1
+        mem_limit: 500m
+        image: poanetwork/tokenbridge-oracle:latest
+        env_file: ./.env.oracle
+        environment: 
+              - NODE_ENV=production
+        restart: unless-stopped
+        entrypoint: yarn watcher:affirmation-request
+        networks:
+           - net_db_bridge_affirmation
+           - net_rabbit_bridge_affirmation
+           - quorum-external-net
+           - ganache-external-net
+    bridge_senderhome:
+        cpus: 0.1
+        mem_limit: 500m
+        image: poanetwork/tokenbridge-oracle:latest
+        env_file: ./.env.oracle
+        environment: 
+            - NODE_ENV=production
+        restart: unless-stopped
+        entrypoint: yarn sender:home
+        networks:
+            - net_db_bridge_senderhome
+            - net_rabbit_bridge_senderhome
+            - quorum-external-net
+    bridge_senderforeign:
+        cpus: 0.1
+        mem_limit: 500m
+        image: poanetwork/tokenbridge-oracle:latest
+        env_file: ./.env.oracle
+        environment: 
+            - NODE_ENV=production
+        restart: unless-stopped
+        entrypoint: yarn sender:foreign
+        networks:
+            - net_db_bridge_senderforeign
+            - net_rabbit_bridge_senderforeign
+            - ganache-external-net
+networks:
+    net_db_bridge_request:
+        driver: bridge
+    net_db_bridge_collected:
+        driver: bridge
+    net_db_bridge_affirmation:
+        driver: bridge
+    net_db_bridge_senderhome:
+        driver: bridge
+    net_db_bridge_senderforeign:
+        driver: bridge
+    net_rabbit_bridge_request:
+        driver: bridge
+    net_rabbit_bridge_collected:
+        driver: bridge
+    net_rabbit_bridge_affirmation:
+        driver: bridge
+    net_rabbit_bridge_senderhome:
+        driver: bridge
+    net_rabbit_bridge_senderforeign:
+        driver: bridge
+    ganache-external-net:
+        external: true
+    quorum-external-net:
+        external: true

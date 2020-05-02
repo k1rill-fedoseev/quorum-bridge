@@ -1,0 +1,72 @@
+{
+  "useWhiteList": false,
+  "jdbc": {
+    "username": "sa",
+    "password": "",
+    "url": "jdbc:h2:/Users/kirillfedoseev/work/quorum-poc/qdata/c2/db2;MODE=Oracle;TRACE_LEVEL_SYSTEM_OUT=0",
+    "autoCreateTables": true
+  },
+  "serverConfigs": [
+    {
+      "app": "ThirdParty",
+      "enabled": true,
+      "serverAddress": "http://172.16.239.102:9082",
+      "cors": {
+        "allowedMethods": [
+          "GET",
+          "OPTIONS"
+        ],
+        "allowedOrigins": [
+          "*"
+        ]
+      },
+      "communicationType": "REST"
+    },
+    {
+      "app": "Q2T",
+      "enabled": true,
+      "serverAddress": "unix:/Users/kirillfedoseev/work/quorum-poc/qdata/c2/tm.ipc",
+      "communicationType": "REST"
+    },
+    {
+      "app": "P2P",
+      "enabled": true,
+      "serverAddress": "http://172.16.239.102:9002",
+      "sslConfig": {
+        "tls": "OFF",
+        "generateKeyStoreIfNotExisted": true,
+        "serverKeyStore": "/Users/kirillfedoseev/work/quorum-poc/qdata/c2/server2-keystore",
+        "serverKeyStorePassword": "quorum",
+        "serverTrustStore": "/Users/kirillfedoseev/work/quorum-poc/qdata/c2/server-truststore",
+        "serverTrustStorePassword": "quorum",
+        "serverTrustMode": "TOFU",
+        "knownClientsFile": "/Users/kirillfedoseev/work/quorum-poc/qdata/c2/knownClients",
+        "clientKeyStore": "/Users/kirillfedoseev/work/quorum-poc/qdata/c2/client2-keystore",
+        "clientKeyStorePassword": "quorum",
+        "clientTrustStore": "/Users/kirillfedoseev/work/quorum-poc/qdata/c2/client-truststore",
+        "clientTrustStorePassword": "quorum",
+        "clientTrustMode": "TOFU",
+        "knownServersFile": "/Users/kirillfedoseev/work/quorum-poc/qdata/c2/knownServers"
+      },
+      "communicationType": "REST"
+    }
+  ],
+  "peer": [
+    {
+      "url": "http://172.16.239.101:9001"
+    },
+    {
+      "url": "http://172.16.239.102:9002"
+    }
+  ],
+  "keys": {
+    "passwords": [],
+    "keyData": [
+      {
+        "privateKeyPath": "/Users/kirillfedoseev/work/quorum-poc/qdata/c2/tm.key",
+        "publicKeyPath": "/Users/kirillfedoseev/work/quorum-poc/qdata/c2/tm.pub"
+      }
+    ]
+  },
+  "alwaysSendTo": []
+}

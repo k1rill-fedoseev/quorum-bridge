@@ -1,0 +1,14 @@
+version: "3.6"
+services:
+    ganache:
+        image: trufflesuite/ganache-cli:v6.9.1
+        command: '-i 1337 -q -s "advance report crucial prize gym tackle average oblige session small minute car"'
+        networks:
+            ganache-external-net:
+                aliases:
+                    - ganache-node1
+        ports: 
+            - '8545:8545'
+networks: 
+    ganache-external-net:
+        external: true
