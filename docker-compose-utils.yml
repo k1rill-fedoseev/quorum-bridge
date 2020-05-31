@@ -1,0 +1,40 @@
+version: "3.6"
+services:
+    permissions-deploy:
+        build: .
+        environment:
+            RPC_URL: 'http://node:8545'
+        command: permissions/init.js
+        volumes: 
+            - './permissions/permission-config.json:/permissions/permission-config.json'
+        networks:
+            quorum-external-net:
+    create-bridge-org:
+        build: .
+        environment:
+            RPC_URL: 'http://node:8545'
+        command: permissions/createBridgeOrg.js
+        networks:
+            quorum-external-net:
+    test:
+        build: .
+        environment:
+            PRIVATE_KEY: '0x9d1756937c9164315676289a69fd46e1836b39b2bf78bbd1f9145d558bd18a7a'
+        env_file: ./.env.oracle
+        entrypoint: node_modules/.bin/mocha --timeout 20000
+        command: test/test.js
+        networks:
+            quorum-external-net:
+            ganache-external-net:
+    bridge-deploy:
+        build: ./contracts
+        command: ./deploy.sh
+        env_file: ./.env.deploy
+        networks: 
+            quorum-external-net:
+            ganache-external-net:
+networks: 
+    quorum-external-net:
+        external: true
+    ganache-external-net:
+        external: true

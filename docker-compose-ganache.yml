@@ -6,9 +6,9 @@ services:
         networks:
             ganache-external-net:
                 aliases:
-                    - ganache-node1
+                    - ganache-node
         ports: 
-            - '8545:8545'
+            - '8546:8545'
 networks: 
     ganache-external-net:
         external: true

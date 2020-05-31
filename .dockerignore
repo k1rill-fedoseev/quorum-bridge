@@ -1,0 +1,4 @@
+contracts
+**/node_modules
+.env*
+**/.git
