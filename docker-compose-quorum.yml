@@ -83,8 +83,6 @@ services:
       - "8999:8999"
     networks:
       quorum-external-net:
-        aliases:
-          - quorum-node
     volumes:
       - cakeshop_vol:/qdata
       - ./quorum/configs:/configs:ro

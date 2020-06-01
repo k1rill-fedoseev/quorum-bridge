@@ -31,8 +31,8 @@ sleep 3
 echo "Creating bridge organization"
 docker-compose -f ./docker-compose-utils.yml up create-bridge-org
 
-# echo "Start cakeshop"
-# docker-compose -f ./docker-compose-quorum.yml up -d cakeshop
+echo "Start cakeshop"
+docker-compose -f ./docker-compose-quorum.yml up -d cakeshop
 
 echo "Starting ganache chain"
 docker-compose -f ./docker-compose-ganache.yml up -d
