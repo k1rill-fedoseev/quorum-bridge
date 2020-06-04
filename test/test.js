@@ -43,21 +43,21 @@ describe('test pair of box contracts', async () => {
     before(async () => {
         homeNonce = await web3Home.eth.getTransactionCount(address)
         foreignNonce = await web3Foreign.eth.getTransactionCount(address)
-        const tx1 = await web3Home.eth.sendTransaction({
+        homeBox = await new web3Home.eth.Contract(abi).deploy({
+            data: bytecode
+        }).send({
             from: address,
-            data: bytecode,
             gasPrice: 0,
             gas: 1000000,
             nonce: homeNonce++
         })
-        homeBox = new web3Home.eth.Contract(abi, tx1.contractAddress)
-        const tx2 = await web3Foreign.eth.sendTransaction({
+        foreignBox = await new web3Foreign.eth.Contract(abi).deploy({
+            data: bytecode
+        }).send({
             from: address,
-            data: bytecode,
             gas: 1000000,
             nonce: foreignNonce++
         })
-        foreignBox = new web3Foreign.eth.Contract(abi, tx2.contractAddress)
     })
 
     it('home -> foreign', async () => {
@@ -65,7 +65,7 @@ describe('test pair of box contracts', async () => {
             .setValueOnOtherNetwork(5, COMMON_HOME_BRIDGE_ADDRESS, foreignBox.options.address)
             .send({
                 from: address,
-                gas: 100000,
+                gas: 1000000,
                 gasPrice: 0,
                 nonce: homeNonce++
             })
@@ -80,7 +80,7 @@ describe('test pair of box contracts', async () => {
         await foreignBox.methods
             .setValueOnOtherNetwork(7, COMMON_FOREIGN_BRIDGE_ADDRESS, homeBox.options.address)
             .send({
-                gas: 100000,
+                gas: 1000000,
                 from: address,
                 nonce: foreignNonce++
             })
