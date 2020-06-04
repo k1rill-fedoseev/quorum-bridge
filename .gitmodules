@@ -2,3 +2,6 @@
 	path = contracts
 	url = https://github.com/poanetwork/tokenbridge-contracts
 	branch = quorum-support
+[submodule "blockscout"]
+	path = blockscout
+	url = https://github.com/poanetwork/blockscout.git

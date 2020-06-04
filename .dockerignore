@@ -1,4 +1,5 @@
 contracts
+blockscout
 **/node_modules
 .env*
 **/.git

@@ -8,12 +8,11 @@ async function deploy(contractName) {
     const bin = fs.readFileSync(`./permissions/compiled/${contractName}.bin`).toString()
     const abi = JSON.parse(fs.readFileSync(`./permissions/compiled/${contractName}.abi`))
     const contract = new web3.eth.Contract(abi)
-    const sender = (await web3.eth.getAccounts())[0]
     const deployed = await contract.deploy({
         data: `0x${bin}`,
         arguments: [].slice.call(arguments, 1)
     }).send({
-        from: sender,
+        from: guardianAccount,
         gas: 30000000,
         gasPrice: 0
     })
@@ -23,6 +22,8 @@ async function deploy(contractName) {
 const guardianAccount = '0x0Dd78c7ed1C9aAFe2bc7cD2Ec2D66201A3b771Ee'
 const guardianAccountPrivateKey = '0xa9cafd151ec927864300f0ec06d88a83096b18fe13df847ef86bea73e527c3de'
 async function main() {
+    await web3.eth.personal.importRawKey(guardianAccountPrivateKey.slice(2), '')
+    await web3.eth.personal.unlockAccount(guardianAccount, '')
     const permissionsUpgradable = await deploy('PermissionsUpgradable', guardianAccount)
     const permissionsInterface = await deploy('PermissionsInterface', permissionsUpgradable.options.address)
     const accountManager = await deploy('AccountManager', permissionsUpgradable.options.address)
@@ -40,7 +41,6 @@ async function main() {
         nodeManager.options.address
     )
 
-    web3.eth.accounts.wallet.add(guardianAccountPrivateKey)
     await permissionsUpgradable.methods.init(
         permissionsInterface.options.address,
         permissionsImplementation.options.address

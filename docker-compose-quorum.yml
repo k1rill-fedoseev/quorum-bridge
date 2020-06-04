@@ -23,8 +23,6 @@ services:
         fi
         GENESIS_FILE="$${DDIR}/genesis.json"
         NETWORK_ID=$$(cat $${GENESIS_FILE} | grep chainId | awk -F " " '{print $$2}' | awk -F "," '{print $$1}')
-        GETH_ARGS_raft="--raft --raftport 50400"
-        GETH_ARGS_istanbul="--emitcheckpoints --istanbul.blockperiod 1 --mine --minerthreads 1 --syncmode full"
         geth --datadir $${DDIR} init $${GENESIS_FILE}
         geth \
           --identity node \
@@ -38,16 +36,23 @@ services:
           --rpcvhosts "*" \
           --rpcaddr 0.0.0.0 \
           --rpcport 8545 \
-          --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorumPermission,${QUORUM_CONSENSUS} \
+          --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorumPermission,istanbul \
           --ws \
           --wsaddr 0.0.0.0 \
           --wsorigins "*" \
           --wsport 8645 \
           --port 21000 \
-          --unlock 0 \
+          --syncmode full \
+          --gcmode archive \
+          --nousb \
+          --keystore $${DDIR}/keystore \
+          --nodekey $${DDIR}/geth/nodekey \
+          --emitcheckpoints \
+          --istanbul.blockperiod 1 \
+          --mine \
+          --minerthreads 1 \
           --allow-insecure-unlock \
-          --password $${DDIR}/keystore/password.txt \
-          $${GETH_ARGS_${QUORUM_CONSENSUS}}
+          --password $${DDIR}/keystore/password.txt
     hostname: node
     ports:
       - "8545:8545"

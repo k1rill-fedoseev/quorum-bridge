@@ -16,8 +16,8 @@ async function sleep(ms) {
 }
 
 async function main() {
-    await web3.eth.personal.importRawKey(guardianAccountPrivateKey.slice(2), '')
-    await web3.eth.personal.unlockAccount(guardianAccount, '')
+    //await web3.eth.personal.importRawKey(guardianAccountPrivateKey.slice(2), '')
+    //await web3.eth.personal.unlockAccount(guardianAccount, '')
 
     const opts = {
         from: guardianAccount

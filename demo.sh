@@ -14,22 +14,22 @@ docker-compose -f ./docker-compose-quorum.yml up -d node
 
 sleep 3
 
-echo "Deploying permissions contracts"
-docker-compose -f ./docker-compose-utils.yml up permissions-deploy
+# echo "Deploying permissions contracts"
+# docker-compose -f ./docker-compose-utils.yml up permissions-deploy
 
-echo "Stopping quorum nodes"
-docker-compose -f ./docker-compose-quorum.yml stop node
+# echo "Stopping quorum nodes"
+# docker-compose -f ./docker-compose-quorum.yml stop node
 
-echo "Writing permission config"
-cp ./permissions/permission-config.json ./quorum/configs/node/permission-config.json
+# echo "Writing permission config"
+# cp ./permissions/permission-config.json ./quorum/configs/node/permission-config.json
 
-echo "Restarting quorum node"
-docker-compose -f ./docker-compose-quorum.yml up -d node
+# echo "Restarting quorum node"
+# docker-compose -f ./docker-compose-quorum.yml up -d node
 
-sleep 3
+# sleep 3
 
-echo "Creating bridge organization"
-docker-compose -f ./docker-compose-utils.yml up create-bridge-org
+# echo "Creating bridge organization"
+# docker-compose -f ./docker-compose-utils.yml up create-bridge-org
 
 echo "Start cakeshop"
 docker-compose -f ./docker-compose-quorum.yml up -d cakeshop
@@ -54,5 +54,11 @@ done;
 
 echo "Running tests"
 docker-compose -f ./docker-compose-utils.yml up test
+
+# echo "Starting blockscout"
+# cd blockscout/docker/
+# docker kill postgres || true
+# docker rm postgres || true
+# ETHEREUM_JSONRPC_HTTP_URL="http://host.docker.internal:8545" ETHEREUM_JSONRPC_VARIANT="geth" make start
 
 ./stop.sh
