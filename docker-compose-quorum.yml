@@ -1,8 +1,8 @@
 version: "3.8"
 services:
-  node:
+  node1:
     restart: "on-failure"
-    image: ${QUORUM_DOCKER_IMAGE}
+    image: quorum-block-reward:latest
     healthcheck:
       test: ["CMD", "wget", "--spider", "--proxy", "off", "http://localhost:8545"]
       interval: 3s
@@ -14,58 +14,62 @@ services:
       - -c
       - |
         DDIR=/qdata/dd
+        GENESIS_FILE="$${DDIR}/genesis.json"
         mkdir -p $${DDIR}
         if [ -z "$$(ls -A $${DDIR})" ]; then
-          cp -RT /configs/node $${DDIR}
+          cp -RT /configs $${DDIR}
+          mkdir $${DDIR}/geth
+          cp /validator_config/nodekey $${DDIR}/geth
         fi
-        if [ -e "/configs/node/permission-config.json" ]; then
-          cp /configs/node/permission-config.json $${DDIR}
-        fi
-        GENESIS_FILE="$${DDIR}/genesis.json"
-        NETWORK_ID=$$(cat $${GENESIS_FILE} | grep chainId | awk -F " " '{print $$2}' | awk -F "," '{print $$1}')
         geth --datadir $${DDIR} init $${GENESIS_FILE}
-        geth \
-          --identity node \
-          --datadir $${DDIR} \
-          --permissioned \
-          --nodiscover \
-          --verbosity 5 \
-          --networkid $${NETWORK_ID} \
-          --rpc \
-          --rpccorsdomain "*" \
-          --rpcvhosts "*" \
-          --rpcaddr 0.0.0.0 \
-          --rpcport 8545 \
-          --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorumPermission,istanbul \
-          --ws \
-          --wsaddr 0.0.0.0 \
-          --wsorigins "*" \
-          --wsport 8645 \
-          --port 21000 \
-          --syncmode full \
-          --gcmode archive \
-          --nousb \
-          --keystore $${DDIR}/keystore \
-          --nodekey $${DDIR}/geth/nodekey \
-          --emitcheckpoints \
-          --istanbul.blockperiod 1 \
-          --mine \
-          --minerthreads 1 \
-          --allow-insecure-unlock \
-          --password $${DDIR}/keystore/password.txt
+        geth --config /configs/geth-config.toml --verbosity 5 --gcmode archive --nodekey $${DDIR}/geth/nodekey --mine --minerthreads 1 --allow-insecure-unlock
     hostname: node
     ports:
       - "8545:8545"
-      - "8645:8645"
     environment:
       PRIVATE_CONFIG: ignore
     networks:
       quorum-external-net:
         aliases:
-          - quorum-node
+          - quorum-node1
     volumes:
-      - node_vol:/qdata
+      - node_vol1:/qdata
       - ./quorum/configs:/configs:ro
+      - ./quorum/validators/0:/validator_config:ro
+  node2:
+    restart: "on-failure"
+    image: quorum-block-reward:latest
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "--proxy", "off", "http://localhost:8545"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        DDIR=/qdata/dd
+        GENESIS_FILE="$${DDIR}/genesis.json"
+        mkdir -p $${DDIR}
+        if [ -z "$$(ls -A $${DDIR})" ]; then
+          cp -RT /configs $${DDIR}
+          mkdir $${DDIR}/geth
+          cp /validator_config/nodekey $${DDIR}/geth
+        fi
+        geth --datadir $${DDIR} init $${GENESIS_FILE}
+        geth --config /configs/geth-config.toml --verbosity 5 --gcmode archive --nodekey $${DDIR}/geth/nodekey --mine --minerthreads 1 --allow-insecure-unlock
+    hostname: node
+    environment:
+      PRIVATE_CONFIG: ignore
+    networks:
+      quorum-external-net:
+        aliases:
+          - quorum-node2
+    volumes:
+      - node_vol2:/qdata
+      - ./quorum/configs:/configs:ro
+      - ./quorum/validators/1:/validator_config:ro
   cakeshop:
     image: ${CAKESHOP_DOCKER_IMAGE}
     restart: "no"
@@ -90,10 +94,11 @@ services:
       quorum-external-net:
     volumes:
       - cakeshop_vol:/qdata
-      - ./quorum/configs:/configs:ro
+      - ./quorum/cakeshop:/configs/cakeshop:ro
 networks: 
   quorum-external-net:
     external: true
 volumes:
-  node_vol:
+  node_vol1:
+  node_vol2:
   cakeshop_vol:

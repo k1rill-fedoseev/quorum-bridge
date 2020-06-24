@@ -3,7 +3,7 @@ services:
     permissions-deploy:
         build: .
         environment:
-            RPC_URL: 'http://node:8545'
+            RPC_URL: 'http://quorum-node1:8545'
         command: permissions/init.js
         volumes: 
             - './permissions/permission-config.json:/permissions/permission-config.json'
@@ -12,7 +12,7 @@ services:
     create-bridge-org:
         build: .
         environment:
-            RPC_URL: 'http://node:8545'
+            RPC_URL: 'http://quorum-node1:8545'
         command: permissions/createBridgeOrg.js
         networks:
             quorum-external-net:
@@ -20,8 +20,11 @@ services:
         build: .
         environment:
             PRIVATE_KEY: '0x9d1756937c9164315676289a69fd46e1836b39b2bf78bbd1f9145d558bd18a7a'
-        env_file: ./.env.oracle
-        entrypoint: node_modules/.bin/mocha --timeout 20000
+            HOME_MEDIATOR_ADDRESS: '0x94Db1495412BdfE138b08952F9041d32b1BbAAA2'
+            FOREIGN_MEDIATOR_ADDRESS: '0x7a96A96271D55131817E2dcB3DDDDd89402D7936'
+            FEE_MANAGER_ADDRESS: '0x7a96A96271D55131817E2dcB3DDDDd89402D7936'
+        env_file: ./.env.mediators-deploy
+        entrypoint: node_modules/.bin/mocha --timeout 120000
         command: test/test.js
         networks:
             quorum-external-net:
@@ -29,7 +32,21 @@ services:
     bridge-deploy:
         build: ./contracts
         command: ./deploy.sh
-        env_file: ./.env.deploy
+        env_file: ./.env.bridge-deploy
+        networks: 
+            quorum-external-net:
+            ganache-external-net:
+    mediators-deploy:
+        build: ./contracts
+        command: ./deploy.sh
+        env_file: ./.env.mediators-deploy
+        networks: 
+            quorum-external-net:
+            ganache-external-net:
+    token-deploy:
+        build: ./contracts
+        command: ./deploy.sh token
+        env_file: ./.env.mediators-deploy
         networks: 
             quorum-external-net:
             ganache-external-net:

@@ -10,7 +10,7 @@ docker-compose -f ./docker-compose-utils.yml build
 rm ./quorum/configs/node/permission-config.json || true
 
 echo "Starting quorum chain"
-docker-compose -f ./docker-compose-quorum.yml up -d node
+docker-compose -f ./docker-compose-quorum.yml up -d node1 node2
 
 sleep 3
 
@@ -31,8 +31,8 @@ sleep 3
 # echo "Creating bridge organization"
 # docker-compose -f ./docker-compose-utils.yml up create-bridge-org
 
-echo "Start cakeshop"
-docker-compose -f ./docker-compose-quorum.yml up -d cakeshop
+# echo "Start cakeshop"
+# docker-compose -f ./docker-compose-quorum.yml up -d cakeshop
 
 echo "Starting ganache chain"
 docker-compose -f ./docker-compose-ganache.yml up -d
@@ -41,6 +41,12 @@ sleep 3
 
 echo "Deploying AMB bridge"
 docker-compose -f ./docker-compose-utils.yml up bridge-deploy
+
+echo "Deploying ERC20 token"
+docker-compose -f ./docker-compose-utils.yml up token-deploy
+
+echo "Deploying AMB_ERC_TO_NATIVE mediators"
+docker-compose -f ./docker-compose-utils.yml up mediators-deploy
 
 echo "Staring AMB oracle"
 source .env.oracle

@@ -1,0 +1,6 @@
+[
+  {
+    "name": "node",
+    "rpcUrl": "http://quorum-node1:8545"
+  }
+]
